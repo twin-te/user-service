@@ -1,12 +1,48 @@
-import { Status } from '@grpc/grpc-js/build/src/constants'
-import { GreetResponse, UserService } from '../../generated'
+import {
+  AddAuthenticationResponse,
+  CreateUserResponse,
+  GetUserResponse,
+  UserService,
+} from '../../generated'
+import { addAuthenticationUseCase } from '../usecase/addAuthentication'
+import { createUserUseCase } from '../usecase/createUser'
+import { getUserUseCase } from '../usecase/getUser'
+import { toGrpcError } from './converter'
 import { GrpcServer } from './type'
 
 export const userService: GrpcServer<UserService> = {
-  greet({ request }, callback) {
-    if (!request.name)
-      callback({ code: Status.INVALID_ARGUMENT, details: '名前が空です' })
-    else
-      callback(null, GreetResponse.create({ text: `hello! ${request.name}` }))
+  async createUser(_, callback) {
+    try {
+      const res = await createUserUseCase()
+      callback(null, CreateUserResponse.create({ ...res }))
+    } catch (e) {
+      callback(toGrpcError(e))
+    }
+  },
+  async addAuthentication({ request }, callback) {
+    try {
+      await addAuthenticationUseCase(
+        request.id,
+        request.provider,
+        request.socialId
+      )
+      callback(null, AddAuthenticationResponse.create())
+    } catch (e) {
+      callback(toGrpcError(e))
+    }
+  },
+  async getUser({ request }, callback) {
+    try {
+      const user = await getUserUseCase(request.id)
+      callback(
+        null,
+        GetUserResponse.create({
+          id: request.id,
+          authentications: user.authentications,
+        })
+      )
+    } catch (e) {
+      callback(toGrpcError(e))
+    }
   },
 }

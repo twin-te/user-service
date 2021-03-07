@@ -1,13 +1,42 @@
 syntax="proto3";
 
 service UserService {
-  rpc Greet(GreetRequest) returns (GreetResponse);
+  rpc CreateUser(CreateUserRequest) returns (CreateUserResponse);
+  rpc AddAuthentication(AddAuthenticationRequest) returns (AddAuthenticationResponse);
+  rpc GetUser(GetUserRequest) returns (GetUserResponse);
 }
 
-message GreetRequest {
-  string name = 1;
+enum Provider {
+  Google = 0;
+  Twitter = 1;
+  Apple = 2;
 }
 
-message GreetResponse {
-  string text = 1;
+message Authentication {
+  Provider provider = 1;
+  string socialId = 2;
+}
+
+message CreateUserRequest {}
+
+message CreateUserResponse {
+  string id = 1;
+}
+
+message AddAuthenticationRequest {
+
+  string id = 1;
+  Provider provider = 2;
+  string socialId = 3;
+}
+
+message AddAuthenticationResponse {}
+
+message GetUserRequest {
+  string id = 1;
+}
+
+message GetUserResponse {
+  string id = 1;
+  repeated Authentication authentications = 2;
 }

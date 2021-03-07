@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "cross-env LOG_LEVEL=trace ts-node --files src/index.ts",
     "proto": "./proto-gen.sh",
-    "client": "grpcc -i -a localhost:50051 -p protos/HelloService.proto",
+    "client": "grpcc -i -a localhost:50051 -p protos/UserService.proto",
     "test": "cross-env LOG_LEVEL=off jest --runInBand --coverage",
     "build": "rm -rf ./dist && tsc && rm -rf ./dist/__tests__ && mv ./dist/src/* ./dist",
     "lint": "eslint src/**/*.ts"

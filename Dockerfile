@@ -14,7 +14,7 @@ RUN yarn build
 FROM node:14-alpine
 WORKDIR /usr/src/app
 
-LABEL org.opencontainers.image.source https://github.com/twin-te/grpc-ts-template
+LABEL org.opencontainers.image.source https://github.com/twin-te/user-service
 
 COPY --from=build-env /usr/src/app/dist ./dist
 COPY --from=build-env /usr/src/app/protos ./protos

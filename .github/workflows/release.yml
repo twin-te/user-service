@@ -1,0 +1,21 @@
+name: release image
+on:
+  release:
+    types: [published]
+jobs:
+  push-image:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v1
+        with:
+          registry: ghcr.io
+          username: ${{ secrets.CR_USER }}
+          password: ${{ secrets.CR_PAT }}
+      - name: Set Tag Name
+        run: echo "TAG_NAME=ghcr.io/twin-te/grpc-ts-template:${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
+      - name: Build
+        run: docker build . -t $TAG_NAME
+      - name: Push
+        run: docker push $TAG_NAME

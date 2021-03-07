@@ -1,0 +1,16 @@
+name: test
+on: [push]
+jobs:
+  exec-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: start container
+        working-directory: .devcontainer
+        run: docker-compose up -d
+      - name: setup test
+        working-directory: .devcontainer
+        run: docker-compose exec -T node bash -c "yarn && yarn proto"
+      - name: run test
+        working-directory: .devcontainer
+        run: docker-compose exec -T node bash -c "yarn test"

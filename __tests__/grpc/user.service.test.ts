@@ -6,7 +6,7 @@ import { UserService } from '../../generated'
 import { ServiceClientConstructor } from '@grpc/grpc-js/build/src/make-client'
 import { GrpcClient } from '../../src/grpc/type'
 import { Status } from '@grpc/grpc-js/build/src/constants'
-import { createUserUseCase } from '../../src/usecase/createUser'
+import { getOrCreateUserUseCase } from '../../src/usecase/getOrCreateUser'
 import { mocked } from 'ts-jest/utils'
 import { v4 } from 'uuid'
 import { addAuthenticationUseCase } from '../../src/usecase/addAuthentication'
@@ -22,7 +22,7 @@ const pkg = grpc.loadPackageDefinition(def)
 const ClientConstructor = pkg.UserService as ServiceClientConstructor
 let client: GrpcClient<UserService>
 
-jest.mock('../../src/usecase/createUser')
+jest.mock('../../src/usecase/getOrCreateUser')
 jest.mock('../../src/usecase/addAuthentication')
 jest.mock('../../src/usecase/getUser')
 
@@ -37,10 +37,10 @@ beforeAll(async () => {
 describe('createUser', () => {
   test('success', (done) => {
     const id = v4()
-    mocked(createUserUseCase).mockImplementation(async () => ({
+    mocked(getOrCreateUserUseCase).mockImplementation(async () => ({
       id,
     }))
-    client.createUser({}, (err, res) => {
+    client.getOrCreateUser({}, (err, res) => {
       expect(err).toBeNull()
       expect(res?.id).toEqual(id)
       done()
@@ -48,10 +48,10 @@ describe('createUser', () => {
   })
 
   test('unexpected error', (done) => {
-    mocked(createUserUseCase).mockImplementation(() => {
+    mocked(getOrCreateUserUseCase).mockImplementation(() => {
       throw new Error('Unexpected Error')
     })
-    client.createUser({}, (err, res) => {
+    client.getOrCreateUser({}, (err, res) => {
       expect(err?.code).toEqual(Status.UNKNOWN)
       done()
     })

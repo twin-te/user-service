@@ -1,20 +1,23 @@
 import {
   AddAuthenticationResponse,
-  CreateUserResponse,
+  GetOrCreateUserResponse,
   GetUserResponse,
   UserService,
 } from '../../generated'
 import { addAuthenticationUseCase } from '../usecase/addAuthentication'
-import { createUserUseCase } from '../usecase/createUser'
+import { getOrCreateUserUseCase } from '../usecase/getOrCreateUser'
 import { getUserUseCase } from '../usecase/getUser'
 import { toGrpcError } from './converter'
 import { GrpcServer } from './type'
 
 export const userService: GrpcServer<UserService> = {
-  async createUser(_, callback) {
+  async getOrCreateUser({ request }, callback) {
     try {
-      const res = await createUserUseCase()
-      callback(null, CreateUserResponse.create({ ...res }))
+      const res = await getOrCreateUserUseCase(
+        request.provider,
+        request.socialId
+      )
+      callback(null, GetOrCreateUserResponse.create({ ...res }))
     } catch (e) {
       callback(toGrpcError(e))
     }

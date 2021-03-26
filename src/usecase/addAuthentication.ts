@@ -16,11 +16,12 @@ export async function addAuthenticationUseCase(
     throw new NotFoundError('指定されたユーザーが見つかりません')
 
   const authRepo = getConnection().getRepository(UserAuthentication)
-  if (await authRepo.findOne({ userId: id, provider }))
+  if (await authRepo.findOne({ provider, user: { id } }))
     throw new AlreadyExistError('認証情報が既に登録されています')
-  const auth = new UserAuthentication()
-  auth.provider = provider
-  auth.userId = id
-  auth.socialId = socialId
-  await authRepo.save(auth)
+
+  await authRepo.save({
+    provider,
+    socialId,
+    user: { id },
+  })
 }

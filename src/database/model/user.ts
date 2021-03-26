@@ -11,7 +11,7 @@ export class User {
   })
   id!: string
 
-  @OneToMany((type) => UserAuthentication, (auth) => auth.userId, {
+  @OneToMany((type) => UserAuthentication, (auth) => auth.user, {
     cascade: true,
   })
   authentications!: UserAuthentication[]

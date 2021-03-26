@@ -1,7 +1,7 @@
 syntax="proto3";
 
 service UserService {
-  rpc CreateUser(CreateUserRequest) returns (CreateUserResponse);
+  rpc GetOrCreateUser(GetOrCreateUserRequest) returns (GetOrCreateUserResponse);
   rpc AddAuthentication(AddAuthenticationRequest) returns (AddAuthenticationResponse);
   rpc GetUser(GetUserRequest) returns (GetUserResponse);
 }
@@ -17,9 +17,12 @@ message Authentication {
   string socialId = 2;
 }
 
-message CreateUserRequest {}
+message GetOrCreateUserRequest {
+  Provider provider = 1;
+  string socialId = 2;
+}
 
-message CreateUserResponse {
+message GetOrCreateUserResponse {
   string id = 1;
 }
 

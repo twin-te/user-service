@@ -18,7 +18,7 @@ export class UserAuthentication {
   id!: number
 
   @ManyToOne((type) => User, (user) => user.id)
-  userId!: string
+  user!: User
 
   @Column({
     name: 'provider',

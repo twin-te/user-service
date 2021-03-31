@@ -1,10 +1,16 @@
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm'
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm'
 import { User } from './user'
 
 export enum Provider {
-  Google,
-  Twitter,
-  Apple,
+  Google = 'Google',
+  Twitter = 'Twitter',
+  Apple = 'Apple',
 }
 
 @Entity({
@@ -18,6 +24,7 @@ export class UserAuthentication {
   id!: number
 
   @ManyToOne((type) => User, (user) => user.id)
+  @JoinColumn({ name: 'user_id' })
   user!: User
 
   @Column({

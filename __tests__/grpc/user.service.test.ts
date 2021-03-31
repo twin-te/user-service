@@ -2,7 +2,7 @@ import { startGrpcServer, stopGrpcServer } from '../../src/grpc'
 import * as protoLoader from '@grpc/proto-loader'
 import path from 'path'
 import * as grpc from '@grpc/grpc-js'
-import { UserService } from '../../generated'
+import { Provider, UserService } from '../../generated'
 import { ServiceClientConstructor } from '@grpc/grpc-js/build/src/make-client'
 import { GrpcClient } from '../../src/grpc/type'
 import { Status } from '@grpc/grpc-js/build/src/constants'
@@ -10,7 +10,6 @@ import { getOrCreateUserUseCase } from '../../src/usecase/getOrCreateUser'
 import { mocked } from 'ts-jest/utils'
 import { v4 } from 'uuid'
 import { addAuthenticationUseCase } from '../../src/usecase/addAuthentication'
-import { Provider } from '../../src/database/model/userAuthentications'
 import { AlreadyExistError, NotFoundError } from '../../src/error'
 import { getUserUseCase } from '../../src/usecase/getUser'
 import { deepContaining } from '../_deepContaining'
@@ -68,7 +67,7 @@ describe('addAuthentication', () => {
     mocked(addAuthenticationUseCase).mockImplementation(
       async (id, provider, socialId) => {
         expect(id).toEqual(data.id)
-        expect(provider).toEqual(data.provider)
+        expect(provider).toEqual('Google') // 後で綺麗にする
         expect(socialId).toEqual(data.socialId)
       }
     )
@@ -108,11 +107,15 @@ describe('getUser', () => {
     ],
   }
   test('success', (done) => {
+    // 後で綺麗にする
+    // @ts-ignore
     mocked(getUserUseCase).mockImplementation(async (id) => {
       expect(id).toEqual(data.id)
       return {
         id,
-        authentications: data.authentications,
+        authentications: [
+          { provider: 'Google', socialId: '100000000000000000' },
+        ],
       }
     })
     client.getUser(data, (err, res) => {

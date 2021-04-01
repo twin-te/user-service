@@ -1,4 +1,4 @@
-import { Entity, OneToMany, PrimaryColumn } from 'typeorm'
+import { Entity, OneToMany, PrimaryColumn, CreateDateColumn } from 'typeorm'
 import { UserAuthentication } from './userAuthentications'
 
 @Entity({
@@ -15,4 +15,7 @@ export class User {
     cascade: true,
   })
   authentications!: UserAuthentication[]
+
+  @CreateDateColumn({ type: 'timestamp' })
+  createdAt!: Date
 }

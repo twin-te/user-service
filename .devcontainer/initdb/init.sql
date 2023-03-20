@@ -1,1 +1,0 @@
-create database twinte_user_service;

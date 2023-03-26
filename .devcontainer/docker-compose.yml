@@ -1,0 +1,26 @@
+version: '3.8'
+
+services:
+  app:
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    command: sleep infinity
+    container_name: twinte-user-service-app
+    environment:
+      PG_HOST: localhost
+      PG_PORT: 5432
+      PG_USERNAME: postgres
+      PG_PASSWORD: postgres
+      PG_DATABASE: twinte_user_service
+    network_mode: service:db
+    volumes:
+      - ..:/go/src
+
+  db:
+    image: postgres:13.1
+    container_name: twinte-user-service-db
+    environment:
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_DB: twinte_user_service

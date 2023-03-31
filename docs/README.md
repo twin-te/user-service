@@ -2,7 +2,7 @@
 1. Open the folder in the dev container.
 2. Run `make bash-app` in the terminal if you need.
 3. Run `make protoc`.
-4. Run `make setup-db`.
+4. Run `make migrate`.
 5. Run `go mod tidy`.
 6. Run `go run main.go`.
 
@@ -16,6 +16,7 @@ Please set the following environment variables used in PostgreSQL.
 
 ## Note
 - The `.proto` file is located in `server/pb/UserService.proto`.
+- For more information about migration, see [here](https://github.com/golang-migrate/migrate/blob/master/database/postgres/TUTORIAL.md).
 
 ## Architecture
 <img src="arch.png">

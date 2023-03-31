@@ -6,11 +6,17 @@ protoc:
     --go-grpc_out=. --go-grpc_opt=paths=source_relative \
     server/pb/UserService.proto
 
+test:
+	go test -count=1 ./...
+
 psql:
 	psql -h ${PG_HOST} -p ${PG_PORT} -U ${PG_USERNAME} -d ${PG_DATABASE}
 
-setup-db:
-	psql -h ${PG_HOST} -p ${PG_PORT} -U ${PG_USERNAME} -d ${PG_DATABASE} -f repository/setup.sql
+migrate:
+	migrate -database "postgres://${PG_USERNAME}:${PG_PASSWORD}@${PG_HOST}:${PG_PORT}/${PG_DATABASE}?sslmode=disable" -path db/migrations up
 
-test:
-	go test -count=1 ./...
+migrate-up-one:
+	migrate -database "postgres://${PG_USERNAME}:${PG_PASSWORD}@${PG_HOST}:${PG_PORT}/${PG_DATABASE}?sslmode=disable" -path db/migrations up 1
+
+migrate-down-one:
+	migrate -database "postgres://${PG_USERNAME}:${PG_PASSWORD}@${PG_HOST}:${PG_PORT}/${PG_DATABASE}?sslmode=disable" -path db/migrations down 1

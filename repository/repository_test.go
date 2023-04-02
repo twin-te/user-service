@@ -62,11 +62,11 @@ func TestCreateUser(t *testing.T) {
 
 	compareUser(t, retrievedUser, &user)
 
-	if err := repo.CreateUser(context.Background(), &entity.User{ID: user.ID}); !errors.Is(err, entity.ErrAlreadyExists) {
+	if err := repo.CreateUser(context.Background(), &entity.User{ID: user.ID}); !errors.Is(err, entity.ErrUserAlreadyExists) {
 		t.Fatalf("Error creating user whose id have already registered: %v", err)
 	}
 
-	if err := repo.CreateUser(context.Background(), &entity.User{ID: uuid.NewString(), Authentications: user.Authentications}); !errors.Is(err, entity.ErrAlreadyExists) {
+	if err := repo.CreateUser(context.Background(), &entity.User{ID: uuid.NewString(), Authentications: user.Authentications}); !errors.Is(err, entity.ErrAuthenticationAlreadyExists) {
 		t.Fatalf("Error creating user whose authentications have already registered: %v", err)
 	}
 }
@@ -78,7 +78,7 @@ func TestGetUserByID(t *testing.T) {
 	}
 	defer close()
 
-	if _, err = repo.GetUserByID(context.Background(), uuid.NewString()); !errors.Is(err, entity.ErrNotFound) {
+	if _, err = repo.GetUserByID(context.Background(), uuid.NewString()); !errors.Is(err, entity.ErrUserNotFound) {
 		t.Fatalf("Error retrieving not created user: %v", err)
 	}
 
@@ -100,7 +100,7 @@ func TestGetUserByAuthentication(t *testing.T) {
 	defer close()
 
 	_, err = repo.GetUserByAuthentication(context.Background(), &entity.Authentication{Provider: entity.ProviderGoogle, SocialID: uuid.NewString()})
-	if !errors.Is(err, entity.ErrNotFound) {
+	if !errors.Is(err, entity.ErrUserNotFound) {
 		t.Fatalf("Error retrieving not created user: %v", err)
 	}
 
@@ -128,12 +128,12 @@ func TestDeleteUserByID(t *testing.T) {
 	}
 
 	_, err = repo.GetUserByID(context.Background(), expectedUser.ID)
-	if !errors.Is(err, entity.ErrNotFound) {
+	if !errors.Is(err, entity.ErrUserNotFound) {
 		t.Fatalf("Error retrieving deleted user: %v", err)
 	}
 
 	err = repo.DeleteUserByID(context.Background(), uuid.NewString())
-	if !errors.Is(err, entity.ErrNotFound) {
+	if !errors.Is(err, entity.ErrUserNotFound) {
 		t.Fatalf("Error retrieving not created user: %v", err)
 	}
 
@@ -164,7 +164,7 @@ func TestAddAuthentication(t *testing.T) {
 		SocialID: uuid.NewString(),
 	}
 
-	if err := repo.AddAuthentication(context.Background(), uuid.NewString(), auth); !errors.Is(err, entity.ErrNotFound) {
+	if err := repo.AddAuthentication(context.Background(), uuid.NewString(), auth); !errors.Is(err, entity.ErrUserNotFound) {
 		t.Fatalf("Error adding authentication to not created user: %v", err)
 	}
 
@@ -185,7 +185,7 @@ func TestAddAuthentication(t *testing.T) {
 		t.Fatalf("Retrieved user authentication does not match expected user authentication")
 	}
 
-	if err := repo.AddAuthentication(context.Background(), user.ID, auth); !errors.Is(err, entity.ErrAlreadyExists) {
+	if err := repo.AddAuthentication(context.Background(), user.ID, auth); !errors.Is(err, entity.ErrAuthenticationAlreadyExists) {
 		t.Fatalf("Error adding authentication already registered: %v", err)
 	}
 }

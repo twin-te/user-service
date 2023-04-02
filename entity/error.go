@@ -2,6 +2,8 @@ package entity
 
 import "errors"
 
-var ErrNotFound = errors.New("not found")
+var ErrUserNotFound = errors.New("user not found")
 
-var ErrAlreadyExists = errors.New("already exists")
+var ErrUserAlreadyExists = errors.New("user already exists")
+
+var ErrAuthenticationAlreadyExists = errors.New("authentication already exists")

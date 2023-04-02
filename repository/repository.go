@@ -21,14 +21,14 @@ type Repository struct {
 
 func (r *Repository) CreateUser(ctx context.Context, u *entity.User) error {
 	failed := func(err error) error {
-		return fmt.Errorf("Repository.CreateUser %+v: %w", u, err)
+		return fmt.Errorf("Repository.CreateUser %+v -> %w", u, err)
 	}
 
 	// Check if the given user id is not registered.
 	query := "SELECT FROM users WHERE id = $1"
 	err := r.db.QueryRowContext(ctx, query, u.ID).Scan()
 	if err == nil {
-		return failed(entity.ErrAlreadyExists)
+		return failed(entity.ErrUserAlreadyExists)
 	}
 	if err != sql.ErrNoRows {
 		return failed(err)
@@ -38,9 +38,9 @@ func (r *Repository) CreateUser(ctx context.Context, u *entity.User) error {
 	for _, a := range u.Authentications {
 		_, err := r.getUserIDByAuthentication(ctx, a)
 		if err == nil {
-			return failed(entity.ErrAlreadyExists)
+			return failed(entity.ErrAuthenticationAlreadyExists)
 		}
-		if !errors.Is(err, entity.ErrNotFound) {
+		if !errors.Is(err, entity.ErrUserNotFound) {
 			return failed(err)
 		}
 	}
@@ -83,7 +83,7 @@ func (r *Repository) CreateUser(ctx context.Context, u *entity.User) error {
 
 func (r *Repository) GetUserByID(ctx context.Context, id string) (*entity.User, error) {
 	failed := func(err error) (*entity.User, error) {
-		return nil, fmt.Errorf("Repository.GetUserByID %q: %w", id, err)
+		return nil, fmt.Errorf("Repository.GetUserByID %q -> %w", id, err)
 	}
 
 	u := &entity.User{}
@@ -91,7 +91,7 @@ func (r *Repository) GetUserByID(ctx context.Context, id string) (*entity.User, 
 	err := r.db.QueryRowContext(ctx, query, id).Scan(&u.ID)
 	if err != nil {
 		if err == sql.ErrNoRows {
-			return failed(entity.ErrNotFound)
+			return failed(entity.ErrUserNotFound)
 		}
 		return failed(err)
 	}
@@ -106,7 +106,7 @@ func (r *Repository) GetUserByID(ctx context.Context, id string) (*entity.User, 
 
 func (r *Repository) GetUserByAuthentication(ctx context.Context, a *entity.Authentication) (*entity.User, error) {
 	failed := func(err error) (*entity.User, error) {
-		return nil, fmt.Errorf("Repository.GetUserByAuthentication %+v: %w", a, err)
+		return nil, fmt.Errorf("Repository.GetUserByAuthentication %+v -> %w", a, err)
 	}
 
 	id, err := r.getUserIDByAuthentication(ctx, a)
@@ -124,14 +124,14 @@ func (r *Repository) GetUserByAuthentication(ctx context.Context, a *entity.Auth
 
 func (r *Repository) DeleteUserByID(ctx context.Context, id string) error {
 	failed := func(err error) error {
-		return fmt.Errorf("Repository.DeleteUserByID %q: %w", id, err)
+		return fmt.Errorf("Repository.DeleteUserByID %q -> %w", id, err)
 	}
 
 	// Check if the given user id is existed.
 	query := "SELECT FROM users WHERE id = $1 AND \"deletedAt\" IS NULL"
 	err := r.db.QueryRowContext(ctx, query, id).Scan()
 	if err == sql.ErrNoRows {
-		return failed(entity.ErrNotFound)
+		return failed(entity.ErrUserNotFound)
 	}
 	if err != nil {
 		return failed(err)
@@ -165,23 +165,23 @@ func (r *Repository) DeleteUserByID(ctx context.Context, id string) error {
 
 func (r *Repository) AddAuthentication(ctx context.Context, id string, a *entity.Authentication) error {
 	failed := func(err error) error {
-		return fmt.Errorf("Repository.AddAuthentication %q %+v: %w", id, a, err)
+		return fmt.Errorf("Repository.AddAuthentication %q %+v -> %w", id, a, err)
 	}
 
 	query := "SELECT FROM users WHERE id = $1"
 	err := r.db.QueryRowContext(ctx, query, id).Scan()
 	if err != nil {
 		if err == sql.ErrNoRows {
-			return failed(entity.ErrNotFound)
+			return failed(entity.ErrUserNotFound)
 		}
 		return failed(err)
 	}
 
 	_, err = r.getUserIDByAuthentication(ctx, a)
 	if err == nil {
-		return failed(entity.ErrAlreadyExists)
+		return failed(entity.ErrAuthenticationAlreadyExists)
 	}
-	if !errors.Is(err, entity.ErrNotFound) {
+	if !errors.Is(err, entity.ErrUserNotFound) {
 		return failed(err)
 	}
 
@@ -195,17 +195,17 @@ func (r *Repository) AddAuthentication(ctx context.Context, id string, a *entity
 }
 
 // getUserIDByAuthentication returns the id of the user authorized by the given authentication.
-// If the corresponding user does not exist, return ErrNotFound.
+// If the corresponding user does not exist, return ErrUserNotFound.
 func (r *Repository) getUserIDByAuthentication(ctx context.Context, a *entity.Authentication) (id string, err error) {
 	failed := func(err error) (string, error) {
-		return id, fmt.Errorf("Repository.getUserIDByAuthentication %+v: %w", a, err)
+		return id, fmt.Errorf("Repository.getUserIDByAuthentication %+v -> %w", a, err)
 	}
 
 	query := "SELECT user_id FROM user_authentications WHERE provider = $1 AND social_id = $2"
 	err = r.db.QueryRowContext(ctx, query, a.Provider, a.SocialID).Scan(&id)
 	if err != nil {
 		if err == sql.ErrNoRows {
-			return failed(entity.ErrNotFound)
+			return failed(entity.ErrUserNotFound)
 		}
 		return failed(err)
 	}
@@ -216,7 +216,7 @@ func (r *Repository) getUserIDByAuthentication(ctx context.Context, a *entity.Au
 // getAuthenticationsByUserID returns the authentications associated with the user specified by the given id.
 func (r *Repository) getAuthenticationsByUserID(ctx context.Context, id string) ([]*entity.Authentication, error) {
 	failed := func(err error) ([]*entity.Authentication, error) {
-		return nil, fmt.Errorf("Repository.getAuthenticationsByUserID %q: %w", id, err)
+		return nil, fmt.Errorf("Repository.getAuthenticationsByUserID %q -> %w", id, err)
 	}
 
 	var sa []*entity.Authentication

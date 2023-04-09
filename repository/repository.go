@@ -245,9 +245,10 @@ func NewRepository() (port.IRepository, func() error, error) {
 	username := os.Getenv("PG_USERNAME")
 	password := os.Getenv("PG_PASSWORD")
 	database := os.Getenv("PG_DATABASE")
+	sslmode := os.Getenv("PG_SSLMODE")
 
 	// https://pkg.go.dev/github.com/lib/pq#hdr-Connection_String_Parameters
-	connStr := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable", host, port, username, password, database)
+	connStr := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=%s", host, port, username, password, database, sslmode)
 	db, err := sql.Open("postgres", connStr)
 	if err != nil {
 		return nil, nil, err

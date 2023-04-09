@@ -13,6 +13,7 @@ Please set the following environment variables used in PostgreSQL.
 - PG_USERNAME
 - PG_PASSWORD
 - PG_DATABASE
+- PG_SSLMODE
 
 ## Note
 - The `.proto` file is located in `server/pb/UserService.proto`.

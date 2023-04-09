@@ -13,6 +13,7 @@ services:
       PG_USERNAME: postgres
       PG_PASSWORD: postgres
       PG_DATABASE: twinte_user_service
+      PG_SSLMODE: disable
     volumes:
       - ..:/go/src
     ports:

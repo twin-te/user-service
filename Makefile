@@ -9,9 +9,6 @@ protoc:
 test:
 	go test -count=1 ./...
 
-psql:
-	psql -h ${PG_HOST} -p ${PG_PORT} -U ${PG_USERNAME} -d ${PG_DATABASE}
-
 migrate:
 	migrate -database "postgres://${PG_USERNAME}:${PG_PASSWORD}@${PG_HOST}:${PG_PORT}/${PG_DATABASE}?sslmode=${PG_SSLMODE}" -path db/migrations up
 

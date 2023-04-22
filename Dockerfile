@@ -1,29 +1,26 @@
-FROM node:14-slim AS build-env
-WORKDIR /usr/src/app
-COPY package.json ./
-COPY yarn.lock ./
-RUN yarn
+# Create executable file.
+FROM golang:1.20-bullseye as deploy-builder
+
+WORKDIR /app
+
+COPY go.mod go.sum Makefile ./
+COPY server/pb/UserService.proto ./server/pb/
+RUN apt-get -y update \
+  && apt-get -y upgrade \
+  && apt-get -y install protobuf-compiler \
+  && go mod download \
+  && go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.28 \
+  && go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@v1.2 \
+  && make protoc
 
 COPY . .
+RUN go build -trimpath -ldflags "-w -s" -o app
 
-RUN yarn proto
+# Deploy
+FROM debian:bullseye-slim as deploy
 
-RUN yarn build
-
-
-FROM node:14-alpine
-WORKDIR /usr/src/app
-
-LABEL org.opencontainers.image.source https://github.com/twin-te/user-service
-
-COPY --from=build-env /usr/src/app/dist ./dist
-COPY --from=build-env /usr/src/app/protos ./protos
-COPY --from=build-env /usr/src/app/generated ./generated
-COPY --from=build-env /usr/src/app/package.json .
-COPY --from=build-env /usr/src/app/yarn.lock .
-
-RUN yarn install --prod
+COPY --from=deploy-builder /app/app .
 
 EXPOSE 50051
 
-CMD ["node", "dist/index.js"]
+CMD ["./app"]

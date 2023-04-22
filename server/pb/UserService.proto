@@ -1,0 +1,53 @@
+syntax="proto3";
+option go_package = "github.com/twin-te/user-service/server/pb";
+
+service UserService {
+  rpc GetOrCreateUser(GetOrCreateUserRequest) returns (GetOrCreateUserResponse);
+  rpc AddAuthentication(AddAuthenticationRequest) returns (AddAuthenticationResponse);
+  rpc GetUser(GetUserRequest) returns (GetUserResponse);
+  rpc DeleteUser(DeleteUserRequest) returns (DeleteUserResponse);
+}
+
+enum Provider {
+  Google = 0;
+  Twitter = 1;
+  Apple = 2;
+}
+
+message Authentication {
+  Provider provider = 1;
+  string socialId = 2;
+}
+
+message GetOrCreateUserRequest {
+  Provider provider = 1;
+  string socialId = 2;
+}
+
+message GetOrCreateUserResponse {
+  string id = 1;
+}
+
+message AddAuthenticationRequest {
+
+  string id = 1;
+  Provider provider = 2;
+  string socialId = 3;
+}
+
+message AddAuthenticationResponse {}
+
+message GetUserRequest {
+  string id = 1;
+}
+
+message GetUserResponse {
+  string id = 1;
+  repeated Authentication authentications = 2;
+}
+
+message DeleteUserRequest {
+  string id = 1;
+}
+
+message DeleteUserResponse {}

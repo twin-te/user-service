@@ -19,6 +19,11 @@ RUN go build -trimpath -ldflags "-w -s" -o app
 # Deploy
 FROM debian:bullseye-slim as deploy
 
+RUN apt-get -y update \
+  && apt-get -y install curl tar \
+  && curl -L https://github.com/golang-migrate/migrate/releases/download/v4.15.2/migrate.linux-amd64.tar.gz | tar xvz \
+  && mv ./migrate /usr/local/bin
+
 COPY --from=deploy-builder /app/app .
 
 EXPOSE 50051

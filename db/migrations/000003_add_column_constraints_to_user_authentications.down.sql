@@ -1,0 +1,7 @@
+BEGIN;
+
+ALTER TABLE user_authentications DROP CONSTRAINT uq_user_authentications_provider_social_id;
+
+ALTER TABLE user_authentications DROP CONSTRAINT uq_user_authentications_user_id_provider;
+
+COMMIT;

@@ -49,3 +49,11 @@ func (s *userServiceServer) DeleteUser(ctx context.Context, in *pb.DeleteUserReq
 	}
 	return &pb.DeleteUserResponse{}, nil
 }
+
+func (s *userServiceServer) DeleteAuthentication(ctx context.Context, in *pb.DeleteAuthenticationRequest) (*pb.DeleteAuthenticationResponse, error) {
+	err := s.u.DeleteAuthentication(ctx, in.Id, converter.FromPBProvider(in.Provider))
+	if err != nil {
+		return nil, converter.ToGRPCError(err, func(err error) { log.Printf("Error userServiceServer.DeleteAuthentication %+v -> %v", in, err) })
+	}
+	return &pb.DeleteAuthenticationResponse{}, nil
+}

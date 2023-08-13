@@ -14,6 +14,8 @@ func ToGRPCError(err error, log func(err error)) error {
 		return status.Error(codes.NotFound, "指定されたユーザーが見つかりませんでした")
 	case errors.Is(err, entity.ErrAuthenticationAlreadyExists):
 		return status.Error(codes.AlreadyExists, "認証情報が既に登録されています")
+	case errors.Is(err, entity.ErrAuthenticationNotFound):
+		return status.Error(codes.NotFound, "指定された認証情報が見つかりませんでした")
 	default:
 		log(err)
 		return status.Error(codes.Internal, "サーバー内で問題が発生しました")

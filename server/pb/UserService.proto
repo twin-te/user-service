@@ -6,6 +6,11 @@ service UserService {
   rpc AddAuthentication(AddAuthenticationRequest) returns (AddAuthenticationResponse);
   rpc GetUser(GetUserRequest) returns (GetUserResponse);
   rpc DeleteUser(DeleteUserRequest) returns (DeleteUserResponse);
+
+  // 紐付けアカウントが1つだけの場合はエラーになる
+  // 紐付けアカウントが2つ以上の場合は指定された紐付けアカウントの紐付けを解除する（hard delete）
+  // 指定されたプロバイダがユーザーに紐づいていない場合はエラーになる
+  rpc DeleteAuthentication(DeleteAuthenticationRequest) returns (DeleteAuthenticationResponse);
 }
 
 enum Provider {
@@ -29,7 +34,6 @@ message GetOrCreateUserResponse {
 }
 
 message AddAuthenticationRequest {
-
   string id = 1;
   Provider provider = 2;
   string socialId = 3;
@@ -51,3 +55,10 @@ message DeleteUserRequest {
 }
 
 message DeleteUserResponse {}
+
+message DeleteAuthenticationRequest {
+  string id = 1;
+  Provider provider = 2;
+}
+
+message DeleteAuthenticationResponse {}

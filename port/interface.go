@@ -29,4 +29,8 @@ type IRepository interface {
 	// If the user does not exist, return ErrUserNotFound.
 	// If the authentication is already registered, return ErrAuthenticationAlreadyExists.
 	AddAuthentication(ctx context.Context, id string, a *entity.Authentication) error
+
+	// DeleteAuthentication deletes the authentication specified by the given userID and provider.
+	// If the corresponding authentication does not exist, return ErrAuthenticationNotFound.
+	DeleteAuthentication(ctx context.Context, userID string, provider entity.Provider) error
 }

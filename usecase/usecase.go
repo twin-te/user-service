@@ -63,6 +63,25 @@ func (uc *UseCase) AddAuthentication(ctx context.Context, id string, a *entity.A
 	return nil
 }
 
+// DeleteAuthentication deletes the authentication specified by the given userID and provider.
+// If the corresponding authentication does not exist, return ErrAuthenticationNotFound.
+func (uc *UseCase) DeleteAuthentication(ctx context.Context, userID string, provider entity.Provider) error {
+	u, err := uc.r.GetUserByID(ctx, userID)
+	if err != nil {
+		return err
+	}
+
+	if len(u.Authentications) < 2 {
+		return fmt.Errorf("This user has only one authentication. So this operation is not allowed.")
+	}
+
+	err = uc.r.DeleteAuthentication(ctx, userID, provider)
+	if err != nil {
+		return fmt.Errorf("UseCase.DeleteAuthentication %q %q -> %w", userID, provider, err)
+	}
+	return nil
+}
+
 func NewUseCase(r port.IRepository) UseCase {
 	return UseCase{r: r}
 }

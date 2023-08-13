@@ -194,6 +194,30 @@ func (r *Repository) AddAuthentication(ctx context.Context, id string, a *entity
 	return nil
 }
 
+func (r *Repository) DeleteAuthentication(ctx context.Context, userID string, provider entity.Provider) error {
+	failed := func(err error) error {
+		return fmt.Errorf("Repository.DeleteAuthentication %q %q -> %w", userID, provider, err)
+	}
+
+	var aid string
+	query := "SELECT id FROM user_authentications WHERE user_id = $1 AND provider = $2"
+	err := r.db.QueryRowContext(ctx, query, userID, provider).Scan(&aid)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return failed(entity.ErrAuthenticationNotFound)
+		}
+		return failed(err)
+	}
+
+	query = "DELETE FROM user_authentications WHERE id = $1"
+	_, err = r.db.ExecContext(ctx, query, aid)
+	if err != nil {
+		return failed(err)
+	}
+
+	return nil
+}
+
 // getUserIDByAuthentication returns the id of the user authorized by the given authentication.
 // If the corresponding user does not exist, return ErrUserNotFound.
 func (r *Repository) getUserIDByAuthentication(ctx context.Context, a *entity.Authentication) (id string, err error) {
